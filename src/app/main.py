@@ -12,29 +12,39 @@ app = FastAPI(title="ARK Afet Sistemi")
 # HTML Şablonları
 templates = Jinja2Templates(directory="src/app/templates")
 
-# Veri Şablonu
+# HTML'deki form verileriyle tam uyumlu Pydantic Modeli
 class VictimData(BaseModel):
     tc_no: str
     name: str
-    phone: str | None = None
     blood_type: str | None = None
-    diseases: str | None = None
+    diseases: str | None = None # HTML'deki 'durum' (help, safe, critical) buraya gelir
 
 # --- 1. ANA SAYFA ---
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-# --- 2. KAYIT API ---
+# --- 2. KAYIT API (HAYAT KURTARAN VERİ KAYDI) ---
 @app.post("/register")
 async def register_victim(data: VictimData):
+    # update_or_create: Aynı TC ile tekrar girerse bilgisini günceller, yeni kayıt açmaz (Veri kirliliğini önler)
     victim, created = await Victim.update_or_create(
         tc_no=data.tc_no,
-        defaults=data.dict()
+        defaults={
+            "name": data.name,
+            "blood_type": data.blood_type,
+            "diseases": data.diseases
+        }
     )
-    return {"status": "OK", "message": f"Kayıt Başarılı. Yanındayız {data.name}."}
+    status_msg = "Kayıt Başarılı. Yanındayız." if created else "Bilgileriniz Güncellendi."
+    return {"status": "OK", "message": f"{status_msg} {data.name}"}
 
-# --- 3. CAPTIVE PORTAL YAKALAYICILAR ---
+# --- 3. CAPTIVE PORTAL & 404 YAKALAYICI (BAĞLANTIDA TUTAN SİHİR) ---
+@app.exception_handler(StarletteHTTPException)
+async def custom_http_exception_handler(request, exc):
+    # Kullanıcı yanlış bir URL'ye gitse bile ARK Paneline geri döner
+    return templates.TemplateResponse("index.html", {"request": request})
+
 @app.get("/generate_204")
 @app.get("/hotspot-detect.html")
 @app.get("/canonical.html")
@@ -42,14 +52,7 @@ async def register_victim(data: VictimData):
 async def captive_portal(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-# --- 4. HATA YAKALAYICI (Bağlantıda Kalmayı Sağlar) ---
-@app.exception_handler(StarletteHTTPException)
-async def custom_http_exception_handler(request, exc):
-    if exc.status_code == 404:
-        return templates.TemplateResponse("index.html", {"request": request})
-    return JSONResponse({"detail": exc.detail}, status_code=exc.status_code)
-
-# Veritabanı Bağlantısı
+# VERİTABANI BAĞLANTISI (db.sqlite3)
 register_tortoise(
     app,
     db_url="sqlite://db.sqlite3",
@@ -58,8 +61,7 @@ register_tortoise(
     add_exception_handlers=True,
 )
 
-# --- 5. ÇALIŞTIRMA (HAYATİ KISIM) ---
 if __name__ == "__main__":
     import uvicorn
-    # host="0.0.0.0" olmazsa telefonlar bağlanamaz
+    # Port 9999 üzerinden tüm ağa yayın yapıyoruz
     uvicorn.run(app, host="0.0.0.0", port=9999)
