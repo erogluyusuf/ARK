@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARK - Afet Yardım Ağı</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: white;
+            font-family: sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+
+        h1 {
+            color: #ff4444;
+            margin-bottom: 5px;
+        }
+
+        p {
+            color: #aaa;
+            margin-top: 0;
+        }
+
+        .card {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+        }
+
+        /* SİREN BUTONU TASARIMI */
+        .siren-btn {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ff0000 0%, #8b0000 100%);
+            border: 5px solid #ff4444;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 20px #ff0000;
+            animation: pulse 2s infinite;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .siren-btn:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 20px rgba(255, 0, 0, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+            }
+        }
+
+        /* FORM TASARIMI */
+        input,
+        select {
+            width: 90%;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #2a2a2a;
+            color: white;
+            font-size: 16px;
+        }
+
+        .save-btn {
+            background: #00C851;
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* FLAŞÖR EFEKTİ (Siren çalınca devreye girer) */
+        .flashing {
+            animation: flash-animation 0.5s infinite;
+        }
+
+        @keyframes flash-animation {
+            0% {
+                background-color: #ff0000;
+            }
+
+            50% {
+                background-color: #0000ff;
+            }
+
+            100% {
+                background-color: #ff0000;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="main-container">
+        <div
+            style="background-color: #ffbb33; color: black; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-weight: bold; font-size: 14px;">
+            ⚠️ DİKKAT: Telefonunuz "İnternet yok, bağlantı kesilsin mi?" diye sorarsa "HAYIR / BAĞLI KAL" seçeneğini
+            seçin. Yoksa sistem çalışmaz!
+        </div>
+        <h1>ARK SİSTEMİ</h1>
+        <p>Afet İletişim Ağı - Darıca</p>
+
+        <button class="siren-btn" onclick="toggleSiren()">
+            🚨<br>SİREN
+        </button>
+
+        <div class="card">
+            <h3>Durum Bildir</h3>
+            <input type="text" id="tc" placeholder="TC Kimlik No (Zorunlu)" maxlength="11">
+            <input type="text" id="isim" placeholder="Ad Soyad (Zorunlu)">
+            <input type="text" id="kan" placeholder="Kan Grubu (Örn: A Rh+)">
+            <select id="durum">
+                <option value="safe">İyiyim / Güvendeyim</option>
+                <option value="help">Yaralıyım / Yardım Lazım</option>
+                <option value="critical">ENKAZ ALTINDAYIM</option>
+            </select>
+            <button class="save-btn" onclick="saveData()">BİLGİLERİMİ GÖNDER</button>
+            <p id="status-msg" style="margin-top:10px; font-size:14px;"></p>
+        </div>
+    </div>
+
+    <script>
+        // --- SİREN MOTORU (Ses Dosyası Gerektirmez) ---
+        let audioCtx;
+        let oscillator;
+        let isPlaying = false;
+        let interval;
+
+        function toggleSiren() {
+            if (!isPlaying) {
+                // Başlat
+                startSiren();
+                document.body.classList.add('flashing'); // Ekranı flaşör yap
+            } else {
+                // Durdur
+                stopSiren();
+                document.body.classList.remove('flashing');
+            }
+            isPlaying = !isPlaying;
+        }
+
+        function startSiren() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            oscillator = audioCtx.createOscillator();
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.value = 600; // Başlangıç frekansı
+            oscillator.connect(audioCtx.destination);
+            oscillator.start();
+
+            // Sesi polis sireni gibi dalgalandır
+            let goingUp = true;
+            interval = setInterval(() => {
+                if (goingUp) {
+                    oscillator.frequency.value += 20;
+                    if (oscillator.frequency.value > 1200) goingUp = false;
+                } else {
+                    oscillator.frequency.value -= 20;
+                    if (oscillator.frequency.value < 600) goingUp = true;
+                }
+            }, 20);
+        }
+
+        function stopSiren() {
+            if (oscillator) {
+                oscillator.stop();
+                clearInterval(interval);
+            }
+        }
+
+        // --- VERİ GÖNDERME (API Bağlantısı) ---
+        async function saveData() {
+            const btn = document.querySelector('.save-btn');
+            const msg = document.getElementById('status-msg');
+
+            const data = {
+                tc_no: document.getElementById('tc').value,
+                name: document.getElementById('isim').value,
+                blood_type: document.getElementById('kan').value,
+                diseases: document.getElementById('durum').value
+            };
+
+            if (!data.tc_no || !data.name) {
+                alert("Lütfen TC ve İsim alanlarını doldurun!");
+                return;
+            }
+
+            btn.innerText = "Gönderiliyor...";
+
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                msg.innerText = "✅ " + result.message;
+                msg.style.color = "#00C851";
+                btn.innerText = "GÖNDERİLDİ";
+            } catch (error) {
+                msg.innerText = "❌ Hata: Sunucuya ulaşılamadı!";
+                msg.style.color = "red";
+                btn.innerText = "TEKRAR DENE";
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,12 @@
+services:
+  ark-core:
+    build: .
+    container_name: ark_core
+    restart: always
+    network_mode: "host"
+    privileged: true
+    volumes:
+      - .:/app
+      - /var/run/dbus:/var/run/dbus
+    # network_mode: host olduğunda 'ports' yazılmaz, 
+    # konteyner direkt Pi'nin 9999 portunu işgal eder.
