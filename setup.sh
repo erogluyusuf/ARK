@@ -1,7 +1,7 @@
 #!/bin/bash
 # ARK: Final Secured Setup (STABLE TR 5GHz)
 # Author: Yusuf Eroğlu
-dene
+
 INTERFACE="wlan0"
 GATEWAY_IP="192.168.4.1"
 PASSWORD="ark12345"
