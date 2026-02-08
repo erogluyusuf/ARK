@@ -8,7 +8,7 @@ class Victim(models.Model):
     
     # --- Medikal Kritik Bilgiler ---
     blood_type = fields.CharField(max_length=10, null=True) # Örn: A Rh+
-    diseases = fields.TextField(null=True)    # Kronik hastalıklar
+    diseases = fields.TextField(null=True)    # HTML'den gelen Durum bilgisi buraya yazılacak
     medications = fields.TextField(null=True) # Kullandığı ilaçlar
     allergies = fields.TextField(null=True)   # Alerjiler
     
