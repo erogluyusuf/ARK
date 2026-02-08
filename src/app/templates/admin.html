@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="5"> <title>ARK - Komuta Merkezi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #0f0f13; color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 20px; }
+        h1 { text-align: center; color: #fbbf24; border-bottom: 2px solid #333; padding-bottom: 10px; }
+        
+        .stats { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+        .stat-box { background: #1f2937; padding: 15px; border-radius: 8px; text-align: center; min-width: 100px; }
+        .stat-box span { display: block; font-size: 2rem; font-weight: bold; }
+        .stat-box label { font-size: 0.8rem; color: #9ca3af; }
+
+        table { width: 100%; border-collapse: collapse; background: #1a1a20; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; }
+        th { background: #27272a; color: #9ca3af; font-size: 0.85rem; }
+        tr:hover { background: #2a2a2e; }
+
+        /* Durum Renkleri */
+        .critical { color: #ef4444; font-weight: bold; animation: pulse 2s infinite; }
+        .help { color: #fbbf24; font-weight: bold; }
+        .safe { color: #10b981; }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <h1>ARK KOMUTA MERKEZİ</h1>
+
+    <div class="stats">
+        <div class="stat-box" style="border: 1px solid #ef4444;">
+            <span style="color: #ef4444;">{{ critical_count }}</span>
+            <label>KRİTİK</label>
+        </div>
+        <div class="stat-box" style="border: 1px solid #fbbf24;">
+            <span style="color: #fbbf24;">{{ help_count }}</span>
+            <label>YARDIM</label>
+        </div>
+        <div class="stat-box" style="border: 1px solid #10b981;">
+            <span style="color: #10b981;">{{ safe_count }}</span>
+            <label>GÜVENDE</label>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>DURUM</th>
+                <th>İSİM</th>
+                <th>TC NO</th>
+                <th>KAN</th>
+                <th>ZAMAN</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for v in victims %}
+            <tr>
+                <td class="{{ 'safe' if v.is_safe else ('critical' if 'KRİTİK' in v.diseases else 'help') }}">
+                    {{ v.diseases }}
+                </td>
+                <td style="font-weight: 600;">{{ v.name }}</td>
+                <td style="font-family: monospace;">{{ v.tc_no }}</td>
+                <td>{{ v.blood_type }}</td>
+                <td style="color: #888; font-size: 0.8rem;">{{ v.last_seen.strftime('%H:%M:%S') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>

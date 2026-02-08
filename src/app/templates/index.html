@@ -3,193 +3,412 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ARK - Afet Yardım Ağı</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-color: #0f0f13;
+            --card-bg: #1a1a20;
+            --primary: #ef4444;
+            /* Acil Kırmızı */
+            --primary-dark: #b91c1c;
+            --success: #10b981;
+            --text-main: #ffffff;
+            --text-muted: #9ca3af;
+            --input-bg: #27272a;
+            --border: #3f3f46;
+        }
+
+        * {
+            box-sizing: border-box;
+            outline: none;
+        }
+
         body {
-            background-color: #121212;
-            color: white;
-            font-family: sans-serif;
-            text-align: center;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            height: 100vh;
-        }
-
-        h1 {
-            color: #ff4444;
-            margin-bottom: 5px;
-        }
-
-        p {
-            color: #aaa;
-            margin-top: 0;
-        }
-
-        .card {
-            background: #1e1e1e;
-            padding: 20px;
-            border-radius: 15px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-            margin-bottom: 20px;
-        }
-
-        /* SİREN BUTONU TASARIMI */
-        .siren-btn {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            background: radial-gradient(circle, #ff0000 0%, #8b0000 100%);
-            border: 5px solid #ff4444;
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 0 20px #ff0000;
-            animation: pulse 2s infinite;
-            margin: 20px 0;
-            display: flex;
             align-items: center;
             justify-content: center;
+            overflow-x: hidden;
+        }
+
+        /* Arkaplan Deseni */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(#333 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        /* Ana Konteyner */
+        .container {
+            width: 100%;
+            max-width: 480px;
+            padding: 20px;
+            display: flex;
             flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Uyarı Bandı */
+        .alert-banner {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            color: #fbbf24;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Başlık Alanı */
+        header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin: 0;
+            background: -webkit-linear-gradient(45deg, #fff, #aaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            color: var(--text-muted);
+            margin: 5px 0 0 0;
+            font-size: 0.9rem;
+        }
+
+        /* Siren Butonu */
+        .siren-wrapper {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0 20px 0;
+        }
+
+        .siren-btn {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #d32f2f, #b71c1c);
+            border: none;
+            color: white;
+            font-weight: 800;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow:
+                0 10px 25px rgba(239, 68, 68, 0.4),
+                inset 0 2px 5px rgba(255, 255, 255, 0.2);
+            transition: transform 0.1s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .siren-btn span {
+            font-size: 2rem;
+            margin-bottom: 5px;
         }
 
         .siren-btn:active {
             transform: scale(0.95);
         }
 
-        @keyframes pulse {
+        .siren-btn.active {
+            animation: pulse-red 1s infinite;
+            background: #ef4444;
+        }
+
+        @keyframes pulse-red {
             0% {
-                box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
             }
 
             70% {
-                box-shadow: 0 0 0 20px rgba(255, 0, 0, 0);
+                box-shadow: 0 0 0 30px rgba(239, 68, 68, 0);
             }
 
             100% {
-                box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
             }
         }
 
-        /* FORM TASARIMI */
-        input,
-        select {
-            width: 90%;
-            padding: 12px;
-            margin: 8px 0;
-            border-radius: 8px;
-            border: 1px solid #333;
-            background: #2a2a2a;
-            color: white;
-            font-size: 16px;
+        /* Form Kartı */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
 
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+            -webkit-appearance: none;
+            /* Safari fix */
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--primary);
+            background-color: #303036;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+        }
+
+        /* Select için özel ok ikonu */
+        .select-wrapper {
+            position: relative;
+        }
+
+        .select-wrapper::after {
+            content: "▼";
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        /* Gönder Butonu */
         .save-btn {
-            background: #00C851;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--success);
             color: white;
             border: none;
-            padding: 15px;
-            width: 100%;
             border-radius: 8px;
-            font-size: 18px;
-            font-weight: bold;
+            font-size: 1rem;
+            font-weight: 700;
             cursor: pointer;
+            transition: filter 0.2s;
             margin-top: 10px;
         }
 
-        /* FLAŞÖR EFEKTİ (Siren çalınca devreye girer) */
-        .flashing {
-            animation: flash-animation 0.5s infinite;
+        .save-btn:active {
+            filter: brightness(0.9);
+            transform: translateY(1px);
         }
 
-        @keyframes flash-animation {
-            0% {
-                background-color: #ff0000;
+        .status-msg {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            min-height: 20px;
+        }
+
+        /* Flaşör Efekti (Ekran Yanıp Sönme) */
+        .flash-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: red;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 5;
+            display: none;
+        }
+
+        .flashing .flash-overlay {
+            display: block;
+            animation: screen-flash 0.6s infinite alternate;
+        }
+
+        @keyframes screen-flash {
+            from {
+                opacity: 0;
             }
 
-            50% {
-                background-color: #0000ff;
+            to {
+                opacity: 0.3;
             }
+        }
 
-            100% {
-                background-color: #ff0000;
-            }
+        /* Footer */
+        footer {
+            margin-top: 20px;
+            color: #555;
+            font-size: 0.75rem;
         }
     </style>
 </head>
 
 <body>
 
-    <div id="main-container">
-        <div
-            style="background-color: #ffbb33; color: black; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-weight: bold; font-size: 14px;">
-            ⚠️ DİKKAT: Telefonunuz "İnternet yok, bağlantı kesilsin mi?" diye sorarsa "HAYIR / BAĞLI KAL" seçeneğini
-            seçin. Yoksa sistem çalışmaz!
-        </div>
-        <h1>ARK SİSTEMİ</h1>
-        <p>Afet İletişim Ağı - Darıca</p>
+    <div class="flash-overlay"></div>
 
-        <button class="siren-btn" onclick="toggleSiren()">
-            🚨<br>SİREN
-        </button>
+    <div class="container">
+
+        <div class="alert-banner">
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div>
+                <strong>Bağlantıyı Kesmeyin!</strong><br>
+                Telefonunuz "İnternet yok" derse "Bağlı Kal" seçeneğini seçin.
+            </div>
+        </div>
+
+        <header>
+            <h1>ARK</h1>
+            <p>Afet ve Acil Durum İletişim Ağı</p>
+        </header>
+
+        <div class="siren-wrapper">
+            <button class="siren-btn" onclick="toggleSiren()">
+                <span>🚨</span>
+                SİREN
+            </button>
+        </div>
 
         <div class="card">
-            <h3>Durum Bildir</h3>
-            <input type="text" id="tc" placeholder="TC Kimlik No (Zorunlu)" maxlength="11">
-            <input type="text" id="isim" placeholder="Ad Soyad (Zorunlu)">
-            <input type="text" id="kan" placeholder="Kan Grubu (Örn: A Rh+)">
-            <select id="durum">
-                <option value="safe">İyiyim / Güvendeyim</option>
-                <option value="help">Yaralıyım / Yardım Lazım</option>
-                <option value="critical">ENKAZ ALTINDAYIM</option>
-            </select>
-            <button class="save-btn" onclick="saveData()">BİLGİLERİMİ GÖNDER</button>
-            <p id="status-msg" style="margin-top:10px; font-size:14px;"></p>
+            <div class="form-group">
+                <label for="tc">TC Kimlik No</label>
+                <input type="tel" id="tc" placeholder="11 Haneli Numaranız" maxlength="11" pattern="\d*">
+            </div>
+
+            <div class="form-group">
+                <label for="isim">Ad Soyad</label>
+                <input type="text" id="isim" placeholder="Adınız ve Soyadınız">
+            </div>
+
+            <div class="form-group">
+                <label for="kan">Kan Grubu</label>
+                <div class="select-wrapper">
+                    <select id="kan">
+                        <option value="" disabled selected>Seçiniz</option>
+                        <option value="A+">A Rh+</option>
+                        <option value="A-">A Rh-</option>
+                        <option value="B+">B Rh+</option>
+                        <option value="B-">B Rh-</option>
+                        <option value="AB+">AB Rh+</option>
+                        <option value="AB-">AB Rh-</option>
+                        <option value="0+">0 Rh+</option>
+                        <option value="0-">0 Rh-</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="durum">Mevcut Durum</label>
+                <div class="select-wrapper">
+                    <select id="durum" style="font-weight: bold;">
+                        <option value="safe" style="color:#10b981;">🟢 Güvendeyim / İyiyim</option>
+                        <option value="help" style="color:#fbbf24;">🟡 Yaralıyım / Yardım Lazım</option>
+                        <option value="critical" style="color:#ef4444;">🔴 ENKAZ ALTINDAYIM</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="save-btn" onclick="saveData()">DURUMUMU BİLDİR</button>
+            <div id="status-msg" class="status-msg"></div>
         </div>
+
+        <footer>
+            ARK System v2.0 • Darıca
+        </footer>
+
     </div>
 
     <script>
-        // --- SİREN MOTORU (Ses Dosyası Gerektirmez) ---
+        // --- SİREN MOTORU ---
         let audioCtx;
         let oscillator;
         let isPlaying = false;
         let interval;
+        const sirenBtn = document.querySelector('.siren-btn');
 
         function toggleSiren() {
             if (!isPlaying) {
-                // Başlat
                 startSiren();
-                document.body.classList.add('flashing'); // Ekranı flaşör yap
+                document.body.classList.add('flashing');
+                sirenBtn.classList.add('active');
+                sirenBtn.innerHTML = "<span>🔊</span>DURDUR";
             } else {
-                // Durdur
                 stopSiren();
                 document.body.classList.remove('flashing');
+                sirenBtn.classList.remove('active');
+                sirenBtn.innerHTML = "<span>🚨</span>SİREN";
             }
             isPlaying = !isPlaying;
         }
 
         function startSiren() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            oscillator = audioCtx.createOscillator();
-            oscillator.type = 'sawtooth';
-            oscillator.frequency.value = 600; // Başlangıç frekansı
-            oscillator.connect(audioCtx.destination);
-            oscillator.start();
 
-            // Sesi polis sireni gibi dalgalandır
+            // Eğer tarayıcı ses bağlamını askıya aldıysa (kullanıcı etkileşimi şartı)
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.value = 600;
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.start();
+            gainNode.gain.value = 0.5; // Ses seviyesi
+
+            // Polis Sireni Döngüsü
             let goingUp = true;
             interval = setInterval(() => {
                 if (goingUp) {
-                    oscillator.frequency.value += 20;
+                    oscillator.frequency.value += 15;
                     if (oscillator.frequency.value > 1200) goingUp = false;
                 } else {
-                    oscillator.frequency.value -= 20;
+                    oscillator.frequency.value -= 15;
                     if (oscillator.frequency.value < 600) goingUp = true;
                 }
             }, 20);
@@ -197,15 +416,18 @@
 
         function stopSiren() {
             if (oscillator) {
-                oscillator.stop();
+                try {
+                    oscillator.stop();
+                } catch (e) { }
                 clearInterval(interval);
             }
         }
 
-        // --- VERİ GÖNDERME (API Bağlantısı) ---
+        // --- API İŞLEMLERİ ---
         async function saveData() {
             const btn = document.querySelector('.save-btn');
             const msg = document.getElementById('status-msg');
+            const inputs = document.querySelectorAll('input, select');
 
             const data = {
                 tc_no: document.getElementById('tc').value,
@@ -214,29 +436,66 @@
                 diseases: document.getElementById('durum').value
             };
 
-            if (!data.tc_no || !data.name) {
-                alert("Lütfen TC ve İsim alanlarını doldurun!");
+            // Basit Doğrulama
+            if (data.tc_no.length < 11 || data.name.length < 3) {
+                msg.innerText = "⚠️ Lütfen TC ve İsim alanlarını eksiksiz doldurun.";
+                msg.style.color = "#fbbf24";
+                shakeButton(btn);
                 return;
             }
 
-            btn.innerText = "Gönderiliyor...";
+            // UI Yükleniyor Hali
+            btn.innerHTML = `<svg class="spinner" viewBox="0 0 50 50" style="width:20px;height:20px;animation:spin 1s linear infinite;"><circle cx="25" cy="25" r="20" fill="none" stroke="white" stroke-width="5"></circle></svg> Gönderiliyor...`;
+            btn.style.opacity = "0.7";
+            btn.disabled = true;
 
             try {
+                // Burada fetch zaman aşımı (timeout) ekleyelim ki sonsuza kadar dönmesin
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 saniye bekle
+
                 const response = await fetch('/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify(data),
+                    signal: controller.signal
                 });
+
+                clearTimeout(timeoutId);
                 const result = await response.json();
+
                 msg.innerText = "✅ " + result.message;
-                msg.style.color = "#00C851";
-                btn.innerText = "GÖNDERİLDİ";
+                msg.style.color = "#10b981";
+                btn.innerHTML = "GÖNDERİLDİ";
+                btn.style.background = "#10b981";
+
             } catch (error) {
-                msg.innerText = "❌ Hata: Sunucuya ulaşılamadı!";
-                msg.style.color = "red";
-                btn.innerText = "TEKRAR DENE";
+                msg.innerText = "❌ Bağlantı Hatası! Tekrar deneyin.";
+                msg.style.color = "#ef4444";
+                btn.innerHTML = "TEKRAR DENE";
+                btn.style.opacity = "1";
+                btn.disabled = false;
             }
         }
+
+        function shakeButton(element) {
+            element.animate([
+                { transform: 'translateX(0)' },
+                { transform: 'translateX(-10px)' },
+                { transform: 'translateX(10px)' },
+                { transform: 'translateX(0)' }
+            ], {
+                duration: 300,
+                iterations: 1
+            });
+        }
+
+        // Spinner için animasyon ekle
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 
